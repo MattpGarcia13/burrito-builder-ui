@@ -1,18 +1,40 @@
+import "./OrderForm.css";
 import { useState } from "react";
 
-function OrderForm(props) {
+function OrderForm({ addOrders }) {
   const [name, setName] = useState("");
   const [ingredients, setIngredients] = useState([]);
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    clearInputs();
+  function inputIngredient(ingredient) {
+    setIngredients((prevIngredients) => [...prevIngredients, ingredient]);
+  }
+
+  function changeUserInput(event) {
+    setName(event.target.value);
+  }
+
+  function handleSubmit(event) {
+    if (name.trim() === "" || ingredients.length === 0) {
+      alert("Please enter a name and select at least one ingredient before submitting.");
+    } else {
+      const newOrder = {
+        id: Date.now(),
+        name: name,
+        ingredients: ingredients,
+      };
+
+      addOrders(newOrder);
+
+      clearInputs();
+    }
+
+    event.preventDefault();
   }
 
   function clearInputs() {
     setName("");
     setIngredients([]);
-  };
+  }
 
   const possibleIngredients = [
     "beans",
@@ -28,33 +50,33 @@ function OrderForm(props) {
     "cilantro",
     "sour cream",
   ];
-  const ingredientButtons = possibleIngredients.map((ingredient) => {
-    return (
-      <button
-        key={ingredient}
-        name={ingredient}
-        // onClick={(e) => }
-      >
-        {ingredient}
-      </button>
-    );
-  });
+
+  const ingredientButtons = possibleIngredients.map((ingredient) => (
+    <button className={ingredient +'-button'}
+      key={ingredient}
+      type='button'
+      name={ingredient}
+      onClick={() => inputIngredient(ingredient)}
+    >
+      {ingredient}
+    </button>
+  ));
 
   return (
-    <form>
-      <input
+    <form onSubmit={handleSubmit}>
+      <input className='form-name'
         type="text"
         placeholder="Name"
         name="name"
         value={name}
-        // onChange={(e) => }
+        onChange={changeUserInput}
       />
 
       {ingredientButtons}
 
       <p>Order: {ingredients.join(", ") || "Nothing selected"}</p>
 
-      <button onClick={(e) => handleSubmit(e)}>Submit Order</button>
+      <button className='submit-button' type="submit">Submit Order</button>
     </form>
   );
 }
